@@ -71,7 +71,31 @@ $("#userProfile").jCryption({getKeysURL:"${getKeysURL}"});
 
 });
 /*]]>*/
+            
+            
 </script> 
+
+<#if LOGIN_PASSWORD_ENCRYPT??>            
+    <script type="text/javascript">
+        var keypair =  ${keypair};
+        $.jCryption.getKeys(keypair, function (res) {
+            keypair = res
+        });
+                
+            function encryptingLoginInfo(passwordId, passwordId2, name, name2, loginForm) {
+                var password = encodeURI($(passwordId2).val()); //防止中文乱码
+                $.jCryption.encrypt(password, keypair,
+                    function (res) {
+                        $(passwordId).val(res);
+                        $.jCryption.encrypt(encodeURI($(name2).val()), keypair, function (r) {
+                            $(name).val(r);
+                            $(loginForm).submit();
+                        });
+                    });
+            }                
+    </script>
+</#if>
+            
 ```
 
 To catch the /EncryptionServlet call you can add the following lines in the mvc configuration src/main/webapp/WEB-INF/spring/webmvc-config.xml:
